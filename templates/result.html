@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Skydash Admin</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendors/feather/feather.css') }}">
+    <link href="{{ url_for('static', filename='vendors/datatables.net-bs4/dataTables.bootstrap4.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendors/ti-icons/css/themify-icons.css') }}" rel="stylesheet">
+    <!-- inject:css -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Add these lines to include DataTables CSS and JavaScript -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+</head>
+
+<body>
+    <div class="container-scroller">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Clustering</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ url_for('index') }}">Back</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <nav class="sidebar sidebar-offcanvas bg-dark" id="sidebar">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="icon-grid menu-icon"></i>
+                            <span class="menu-title">Dashboard</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav mt-4"> <!-- Menggunakan kelas mt-4 untuk margin-top -->
+                    <div class="container">
+                      <div class="row">
+                        <div class="col">
+                          <div class="card bg-transparent">
+                            <div class="card-body bg-transparent text-center">
+                              <h5 class="card-title fw-semibold text-white">{% block title %}Klasterisasi Data Customer{% endblock %}</h5>
+                              <img class="mb-3" src="{{ url_for('static', filename='images/logo_umby.png') }}" width="150px">
+                              <p class="card-text text-white">Alifah Maya</p>
+                              <!-- <p class="card-text text-white"></p> -->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </ul>
+            </nav>
+            <div class="container-fluid">
+                <div class="card p-4 ">
+                    <h3 class="text-center">Hasil Klasterisasi</h3>
+                    <div class="table-responsive">
+                        <table id="resultTable" class="table table-striped">
+                            <div class="mb-3">
+                                <label for="clusterFilter">Filter by Cluster:</label>
+                                <select id="clusterFilter" class="form-control">
+                                    <option value="">All Clusters</option>
+                                    {% for cluster in clusters['Cluster'].unique() %}
+                                        <option value="{{ cluster }}">{{ cluster }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <thead>
+                                <tr>
+                                    <th>CustomerID</th>
+                                    <th>Genre</th>
+                                    <th>Age</th>
+                                    <th>Annual Income (k$)</th>
+                                    <th>Spending Score (1-100)</th>
+                                    <th>Cluster</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for index, row in clusters.iterrows() %}
+                                    <tr>
+                                        <td>{{ row['CustomerID'] }}</td>
+                                        <td>{{ row['Genre'] }}</td>
+                                        <td>{{ row['Age'] }}</td>
+                                        <td>{{ row['Annual Income (k$)'] }}</td>
+                                        <td>{{ row['Spending Score (1-100)'] }}</td>
+                                        <td>{{ row['Cluster'] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <img style="max-width: 60%; height: auto;" src="data:image/png;base64,{{ img_data }}" alt="Clustered Data Chart">
+                </div>
+            </div>
+            <script>
+                $(document).ready(function() {
+                    // Initialize DataTable with options
+                    var table = $('#resultTable').DataTable({
+                        "paging": true,
+                        "lengthChange": true,
+                        "searching": true,
+                        "ordering": true,
+                        "info": true,
+                        "autoWidth": true,
+                        "lengthMenu": [10, 25, 50, 100],
+                        "pageLength": 10
+                    });
+
+                    // Add event listener for the cluster filter
+                    $('#clusterFilter').on('change', function() {
+                        var cluster = $(this).val();
+                        table.column(5).search(cluster).draw(); // Assuming cluster column is at index 5
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>
